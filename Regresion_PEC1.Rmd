@@ -72,7 +72,7 @@ file.remove(
 ```{r libraries, include=FALSE}
 # Load packages
 library(knitr)
-
+library(tseries)
 ```
 
 # Ejercicio 1. Estimación del peso del hígado
@@ -145,8 +145,27 @@ head(new_data)
 ```
 
 
+## Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera
 
+El contraste de Jarque-Bera es un ensayo de normalidad que determina si los datos muestrales tienen la asimetría y curtosis de una distribución normal. 
 
+Como hipótesis nula estableceremos que la asimetría y curtosis de la variable son iguales a las de la distribución normal. 
+
+Como hipótesis alternativa entenderemos lo contrario, que la asimetría o la curtosis de la variable no son iguales a las de una distribución normal.
+
+Emplearemos un nivel de significatividad del 5%.
+
+Para realizar el test usaremos la función `jarque.bera.test()` disponible en el paquete `tseries`:
+```{r jarque bera test}
+# Peso
+jarque.bera.test(new_data[["weight"]])
+```
+```{r}
+# Altura
+jarque.bera.test(new_data[["height"]])
+```
+
+En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que **no podemos rechazar la hipótesis nula** de cada variable de seguir la distribución normal.
 
 
 

@@ -180,7 +180,7 @@ summary {
 <h1 class="title toc-ignore">Regresión, modelos y métodos</h1>
 <h3 class="subtitle">Prueba de evaluación contínua 1</h3>
 <h4 class="author">Jorge Vallejo Ortega</h4>
-<h4 class="date">15 de November, 2020</h4>
+<h4 class="date">16 de November, 2020</h4>
 
 </div>
 
@@ -193,8 +193,9 @@ summary {
 <li><a href="#resumen-numérico">Resumen numérico</a></li>
 </ul></li>
 <li><a href="#completar-la-base-de-datos-con-las-variables-derivadas-asc-e-imc">Completar la base de datos con las variables derivadas ASC e IMC</a></li>
+<li><a href="#comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera">Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</a></li>
 </ul></li>
-<li><a href="#references">References</a></li>
+<li><a href="#referencias">Referencias</a></li>
 </ul>
 </div>
 
@@ -274,6 +275,29 @@ head(new_data)</code></pre>
 ## 4      F   44.1  159.3       644.60       789.54 1263.913 17.37829
 ## 5      F   52.1  175.2       668.54       817.59 1453.592 16.97343
 ## 6      F   51.3  175.2       671.83       931.89 1444.064 16.71280</code></pre>
+</div>
+<div id="comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera" class="section level2">
+<h2>Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</h2>
+<p>El contraste de Jarque-Bera es un ensayo de normalidad que determina si los datos muestrales tienen la asimetría y curtosis de una distribución normal.</p>
+<p>Como hipótesis nula estableceremos que la asimetría y curtosis de la variable son iguales a las de la distribución normal.</p>
+<p>Como hipótesis alternativa entenderemos lo contrario, que la asimetría o la curtosis de la variable no son iguales a las de una distribución normal.</p>
+<p>Emplearemos un nivel de significatividad del 5%.</p>
+<p>Para realizar el test usaremos la función <code>jarque.bera.test()</code> disponible en el paquete <code>tseries</code>:</p>
+<pre class="r"><code># Peso
+jarque.bera.test(new_data[[&quot;weight&quot;]])</code></pre>
+<pre><code>## 
+##  Jarque Bera Test
+## 
+## data:  new_data[[&quot;weight&quot;]]
+## X-squared = 5.1919, df = 2, p-value = 0.07457</code></pre>
+<pre class="r"><code># Altura
+jarque.bera.test(new_data[[&quot;height&quot;]])</code></pre>
+<pre><code>## 
+##  Jarque Bera Test
+## 
+## data:  new_data[[&quot;height&quot;]]
+## X-squared = 3.7732, df = 2, p-value = 0.1516</code></pre>
+<p>En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que <strong>no podemos rechazar la hipótesis nula</strong> de cada variable de seguir la distribución normal.</p>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
@@ -283,8 +307,8 @@ head(new_data)</code></pre>
 <!-- ``` -->
 </div>
 </div>
-<div id="references" class="section level1 unnumbered">
-<h1>References</h1>
+<div id="referencias" class="section level1 unnumbered">
+<h1>Referencias</h1>
 <div id="refs" class="references">
 <div id="ref-chan2006estimating">
 <p>Chan, See Ching, Chi Leung Liu, Chung Mau Lo, Banny K Lam, Evelyn W Lee, Yik Wong, and Sheung Tat Fan. 2006. “Estimating Liver Weight of Adults by Body Weight and Gender.” <em>World Journal of Gastroenterology: WJG</em> 12 (14). Baishideng Publishing Group Inc: 2217.</p>
