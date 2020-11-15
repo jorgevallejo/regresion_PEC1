@@ -5,7 +5,7 @@ author: "Jorge Vallejo Ortega"
 date: '`r format(Sys.Date(),"%e de %B, %Y")`'
 output:
   html_document:
-  toc: true
+     toc: true
 # pdf_document:
 #   number_sections: true
 # toc: true
@@ -23,7 +23,7 @@ knit: (function(inputFile, encoding) {
 # And:
 # https://stackoverflow.com/a/46007686/10647267
 
-# bibliography: references.bib
+bibliography: references.bib
 ---
   
 ```{r setup, include=FALSE}
@@ -75,6 +75,83 @@ library(knitr)
 
 ```
 
+# Ejercicio 1. Estimación del peso del hígado
+
+En este ejercicio vamos a trabajar con un set de datos recogidos [@chan2006estimating] de donantes de hígado con el que se quieren relacionar el peso estándar del hígado con las medidas de peso y altura. Las variables registradas son las siguientes:
+
+-**gender:** Sexo del donante vivo de hígado.  
+-**weight:** Peso del donante (kg).  
+-**height:** Altura del donante (cm).  
+-**liver_weight:** Peso estimado del hígado (g).  
+-**liver_volume:** Volumen del hígado según la tomografía computarizada (ml).
+
+Antes de ponernos a trabajar con los datos, es convenientes familiarizarnos con ellos para conocer su estructura y la distribución de datos en cada variable.
+
+## Exploración de los datos
+
+### Muestra de las primeras observaciones
+```{r carga de datos}
+# Load data
+data <- read.csv("data/chan_data.csv")
+head(data)
+```
+
+### Estructura
+
+```{r estructura dataset}
+str(data)
+```
+
+El set de datos está compuesto por 158 observaciones de 5 variables. De estas variables, cuatrto son númericas ( *weight, height, liver_weight* y *liver_volume* ) y una es categórica ( _gender_ ). Esta última contiene dos niveles ("F" y "M").
+
+### Resumen numérico
+```{r resumen numerico}
+summary(data)
+```
+
+El resumen numérico nos ayuda a comparar la distribución de datos dentro de cada variable con lo que esperamos según la descripción de la variable. Específicamente, podemos usar el resumen para buscar valores anómalos (por ejemplo, cantidades negativas, o valores superiores a los máximos que pueden alcanzar los humanos). En este caso no parece haber nada que llame la atención al menos en las variables _weight_ y _height_, que a simple vista parecen respetar la distribución típica de humanos adultos. Las otras dos variables, *liver_weight* y *liver_volume*, son más difíciles de interpretar ya que no estamos familiarizados con ellas; aunque podemos decir que parecen seguir una distribución normal por el parecido entre media y mediana.
+
+Un detalle interesante también es la relación entre diferentes niveles de la variable categórica, ya que podemos ver que en el set de datos hay el doble de observaciones correspondientes a mujeres que a hombres.
+
+Otra utilidad del resumen es la detección de valores ausentes (codificados en R como NA). No aparece en ninguna de las variables, así que el set de datos es completo; no falta ningún valor en ninguna de las observaciones.
+
+
+## Completar la base de datos con las variables derivadas ASC e IMC
+
+El área de superficie corporal (ASC) la calcularemos, como en el paper original, según la fórmula de Du Bois [@du_bois_delafield_1916_1423319]:
+$$
+\log A = \log W \times 0.425 + \log H \times 0.725 + 71.84
+$$
+
+Siendo _A_ la superficie en centímetros cuadrados, _W_ el peso en kilogramos, y _H_ la altura en centímetros.
+
+Asimismo también calcularemos el índice de masa corporal (IMC); que se averigua según la siguiente fórmula:
+$$
+IMC = W \text{(kg)}/H^2 \text{(m)}
+$$
+Midiéndose el IMC resultante en kg/m^2.
+
+Calculamos las nuevas variables y las añadimos al set de datos con el siguiente código R:
+```{r asc imc}
+# Copy dataset
+new_data <- data
+# Add ASC
+new_data[["ASC"]] <- exp(
+  log(new_data[["weight"]]) * 0.425 + log(new_data[["height"]]) * 0.725 + 1.8564)
+# Add IMC
+new_data[["IMC"]] <- new_data[["weight"]]/(new_data[["height"]]/100)^2
+
+head(new_data)
+```
+
+
+
+
+
+
+
+
+
 
 <!-- # Apéndice A: Código -->
 
@@ -87,4 +164,4 @@ library(knitr)
 <!-- ``` -->
 
 
-# References
+# Referencias
