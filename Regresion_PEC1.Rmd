@@ -168,6 +168,24 @@ jarque.bera.test(new_data[["height"]])
 En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que **no podemos rechazar la hipótesis nula** de cada variable de seguir la distribución normal.
 
 
+## Búsqueda de outliers para peso y altura
+
+Un outlier es una observación que no se ajusta bien al modelo con el que estamos trabajando. Existen métodos estadísticos para localizarlos, pero el modo más intuitivo cuando trabajamos con pocas dimensiones es representando las observaciones en gráficas:
+
+```{r}
+plot(new_data[, c("height", "weight")],
+     col = ifelse(new_data$height < 155 & new_data$weight > 70, "red", "black"),
+     xlab = "Peso", ylab = "Altura"
+)
+abline(lm(new_data[["weight"]] ~ new_data[["height"]]),
+       col = "blue")
+```
+
+Parece haber un correlación positiva entre peso y altura, distribuyéndose las observaciones en la gráfica siguiendo una diagonal más o menos marcada (hemos añadido la línea de regresión en color azul para mayor claridad). Sin embargo observamos un sujeto en la zona superior izquierda, remarcado en rojo, llamativamente alejado del resto. ESto es, para su altura presenta un peso muy superior al que esperamos dentro de la muestra.
+
+
+
+
 
 
 
