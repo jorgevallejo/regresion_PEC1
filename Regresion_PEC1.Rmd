@@ -173,15 +173,54 @@ En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que *
 Un outlier es una observación que no se ajusta bien al modelo con el que estamos trabajando. Existen métodos estadísticos para localizarlos, pero el modo más intuitivo cuando trabajamos con pocas dimensiones es representando las observaciones en gráficas:
 
 ```{r}
+# Construme modelo altura-peso
+mod_altura_peso <-lm(new_data[["weight"]] ~ new_data[["height"]])
+
+# Genera grafica
 plot(new_data[, c("height", "weight")],
      col = ifelse(new_data$height < 155 & new_data$weight > 70, "red", "black"),
      xlab = "Peso", ylab = "Altura"
 )
-abline(lm(new_data[["weight"]] ~ new_data[["height"]]),
+abline(mod_altura_peso,
        col = "blue")
+outlier <- new_data[new_data$height < 155 & new_data$weight > 70,]
+text(x = ceiling(outlier$height +1),
+     y = ceiling(outlier$weight +1),
+     labels = rownames(outlier))
 ```
 
 Parece haber un correlación positiva entre peso y altura, distribuyéndose las observaciones en la gráfica siguiendo una diagonal más o menos marcada (hemos añadido la línea de regresión en color azul para mayor claridad). Sin embargo observamos un sujeto en la zona superior izquierda, remarcado en rojo, llamativamente alejado del resto. ESto es, para su altura presenta un peso muy superior al que esperamos dentro de la muestra.
+
+
+Si preferimos utilizar métodos numéricos, podemos estudentizar los resíduos y examinar los mayores de entre ellos (_jacknife or crossvalidated residuals_):
+
+```{r}
+stud <- rstudent(mod_altura_peso)
+head(sort(abs(stud), decreasing = TRUE))
+```
+
+Vemos que la observación con mayor residuo estudentizado coincide con la que habíamos detectado en el gráfico. ¿Pero la clasificaríamos realmente como un outlier? Si calculamos el valor crítico de Bonferroni para $\alpha$ = 0.05:
+```{r}
+n <- nrow(new_data) # Size
+p <- 2              # Dimensions
+(vc <- abs(qt(0.05/(n*2), (n-p-1)))) # Critical value (absolute) 
+```
+
+Vemos que, efectivamente, el valor absoluto de la observación 126 es mayor que el valor absoluto del valor crítico corregido por Bonferroni y numéricamente lo consideraríamos un outlier.
+
+Si queremos representar este test gráficamente:
+
+```{r}
+plot(stud, type = 'h',
+     main="Outliers por valor crítico",
+     xlab = "Observaciones",
+     ylab = "Residuos estudentizados")
+abline(h= vc, col = "red")
+abline(h = 0)
+abline(h = -vc, col = "red")
+```
+
+Sin embargo, aunque hayamos definido ese valor como un _outlier_ no sabemos si aparece en la muestra por alguna razón anómala (p.e. error al codificar las medidas) o si realmente ese tipo de valores existen en la población a estudiar, así que no lo eliminaremos. Tampoco hemos comprobado si ese valor único ejerce una influencia desproporcionada en los resultados de la regresión.
 
 
 
