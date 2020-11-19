@@ -116,7 +116,7 @@ Un detalle interesante también es la relación entre diferentes niveles de la v
 Otra utilidad del resumen es la detección de valores ausentes (codificados en R como NA). No aparece en ninguna de las variables, así que el set de datos es completo; no falta ningún valor en ninguna de las observaciones.
 
 
-## Completar la base de datos con las variables derivadas ASC e IMC
+## 1a. Completar la base de datos con las variables derivadas ASC e IMC
 
 El área de superficie corporal (ASC) la calcularemos, como en el paper original, según la fórmula de Du Bois [@du_bois_delafield_1916_1423319]:
 $$
@@ -145,7 +145,7 @@ head(new_data)
 ```
 
 
-## Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera
+## 1b. Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera
 
 El contraste de Jarque-Bera es un ensayo de normalidad que determina si los datos muestrales tienen la asimetría y curtosis de una distribución normal. 
 
@@ -168,7 +168,7 @@ jarque.bera.test(new_data[["height"]])
 En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que **no podemos rechazar la hipótesis nula** de cada variable de seguir la distribución normal.
 
 
-## Búsqueda de outliers para peso y altura
+## 1c. Búsqueda de outliers para peso y altura
 
 Un outlier es una observación que no se ajusta bien al modelo con el que estamos trabajando. Existen métodos estadísticos para localizarlos, pero el modo más intuitivo cuando trabajamos con pocas dimensiones es representando las observaciones en gráficas:
 

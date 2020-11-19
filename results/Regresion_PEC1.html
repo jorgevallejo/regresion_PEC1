@@ -192,9 +192,9 @@ summary {
 <li><a href="#estructura">Estructura</a></li>
 <li><a href="#resumen-numérico">Resumen numérico</a></li>
 </ul></li>
-<li><a href="#completar-la-base-de-datos-con-las-variables-derivadas-asc-e-imc">Completar la base de datos con las variables derivadas ASC e IMC</a></li>
-<li><a href="#comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera">Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</a></li>
-<li><a href="#búsqueda-de-outliers-para-peso-y-altura">Búsqueda de outliers para peso y altura</a></li>
+<li><a href="#a.-completar-la-base-de-datos-con-las-variables-derivadas-asc-e-imc">1a. Completar la base de datos con las variables derivadas ASC e IMC</a></li>
+<li><a href="#b.-comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera">1b. Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</a></li>
+<li><a href="#c.-búsqueda-de-outliers-para-peso-y-altura">1c. Búsqueda de outliers para peso y altura</a></li>
 </ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
@@ -250,8 +250,8 @@ head(data)</code></pre>
 <p>Otra utilidad del resumen es la detección de valores ausentes (codificados en R como NA). No aparece en ninguna de las variables, así que el set de datos es completo; no falta ningún valor en ninguna de las observaciones.</p>
 </div>
 </div>
-<div id="completar-la-base-de-datos-con-las-variables-derivadas-asc-e-imc" class="section level2">
-<h2>Completar la base de datos con las variables derivadas ASC e IMC</h2>
+<div id="a.-completar-la-base-de-datos-con-las-variables-derivadas-asc-e-imc" class="section level2">
+<h2>1a. Completar la base de datos con las variables derivadas ASC e IMC</h2>
 <p>El área de superficie corporal (ASC) la calcularemos, como en el paper original, según la fórmula de Du Bois <span class="citation">(Du Bois 1916)</span>: <span class="math display">\[
 \log A = \log W \times 0.425 + \log H \times 0.725 + 71.84
 \]</span></p>
@@ -277,8 +277,8 @@ head(new_data)</code></pre>
 ## 5      F   52.1  175.2       668.54       817.59 1453.592 16.97343
 ## 6      F   51.3  175.2       671.83       931.89 1444.064 16.71280</code></pre>
 </div>
-<div id="comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera" class="section level2">
-<h2>Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</h2>
+<div id="b.-comprobar-la-normalidad-de-las-variables-peso-y-altura-con-el-contraste-de-jarque-bera" class="section level2">
+<h2>1b. Comprobar la normalidad de las variables peso y altura con el contraste de Jarque-Bera</h2>
 <p>El contraste de Jarque-Bera es un ensayo de normalidad que determina si los datos muestrales tienen la asimetría y curtosis de una distribución normal.</p>
 <p>Como hipótesis nula estableceremos que la asimetría y curtosis de la variable son iguales a las de la distribución normal.</p>
 <p>Como hipótesis alternativa entenderemos lo contrario, que la asimetría o la curtosis de la variable no son iguales a las de una distribución normal.</p>
@@ -300,8 +300,8 @@ jarque.bera.test(new_data[[&quot;height&quot;]])</code></pre>
 ## X-squared = 3.7732, df = 2, p-value = 0.1516</code></pre>
 <p>En ninguno de los dos casos obtenemos p-valores por debajo de 0.05, por lo que <strong>no podemos rechazar la hipótesis nula</strong> de cada variable de seguir la distribución normal.</p>
 </div>
-<div id="búsqueda-de-outliers-para-peso-y-altura" class="section level2">
-<h2>Búsqueda de outliers para peso y altura</h2>
+<div id="c.-búsqueda-de-outliers-para-peso-y-altura" class="section level2">
+<h2>1c. Búsqueda de outliers para peso y altura</h2>
 <p>Un outlier es una observación que no se ajusta bien al modelo con el que estamos trabajando. Existen métodos estadísticos para localizarlos, pero el modo más intuitivo cuando trabajamos con pocas dimensiones es representando las observaciones en gráficas:</p>
 <pre class="r"><code># Construme modelo altura-peso
 mod_altura_peso &lt;-lm(new_data[[&quot;weight&quot;]] ~ new_data[[&quot;height&quot;]])
