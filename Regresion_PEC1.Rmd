@@ -282,7 +282,32 @@ legend("bottomright", paste("R-squared:", round(summary(lm(liver_volume ~ liver_
 Tanto en hombres como mujeres, el área y el peso corporal presentan cierta relación con el peso calculado del hígado, pero débil. La altura corporal está incluso menos correlacionada con el peso calculado del hígado.
 
 
+## 1e. Comprueba si las rectas de regresión de la primera gráfica son paralelas
 
+Cuando queremos saber si dos rectas son paralelas, básicamente nos estamos haciendo la pregunta de si ambas rectas tienen la misma pendiente. Esto es, trabajaremos con la hipótesis nula de que la pendiente de ambas rectas es la misma:
+$$
+H_0: \beta_{females} = \beta_{males}
+$$
+
+Matemáticamente existen varias formas de comprobar la hipótesis, pero aquí utilizaremos una de las más sencillas (con las herramientas de las que disponemos), el **análisis de la covarianza**.
+
+En primer lugar construiremos un modelo de regresión lineal con la variable respuesta _peso calculado_, la variable concomitante _área corporal_ y el factor _género_. Una parte muy importante de este modelo es que vamos a examinar la **interacción** entre el áre corporal y el género:
+
+```{r modelo interaccion area corporal genero}
+modelo_area_genero <- lm(liver_weight ~ ASC*gender, data = new_data)
+```
+
+Resumen del modelo:
+```{r}
+summary(modelo_area_genero)
+```
+
+Mediante el análisis de la varianza podremos interrogar la significatividad de la interacción entre área y género, y averiguar por tanto si los valores para ambas rectas son estadísticamente diferentes:
+```{r}
+anova(modelo_area_genero)
+```
+
+Vemos en la tabla que el contraste ASC:gender (área:género) no es significativo para un nivel de significatividad del 5%, y por tanto no tenemos razones para rechazar la hipótesis nula de igualdad de pendientes. Esto es, concluimos que **las rectas de regresión para hembras y machos son paralelas**.
 
 
 
