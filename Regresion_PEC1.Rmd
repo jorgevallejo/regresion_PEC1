@@ -120,10 +120,10 @@ Otra utilidad del resumen es la detección de valores ausentes (codificados en R
 
 El área de superficie corporal (ASC) la calcularemos, como en el paper original, según la fórmula de Du Bois [@du_bois_delafield_1916_1423319]:
 $$
-\log A = \log W \times 0.425 + \log H \times 0.725 + 71.84
+\log A = \log W \times 0.425 + \log H \times 0.725 + 0.007184
 $$
 
-Siendo _A_ la superficie en centímetros cuadrados, _W_ el peso en kilogramos, y _H_ la altura en centímetros.
+Siendo _A_ la superficie en metros cuadrados, _W_ el peso en kilogramos, y _H_ la altura en centímetros. Para la constante hemos usado 0.007184 en lugar de 71.84 (de la fórmula original de Du Bois) para que el resultado estén en metros cuadrados.
 
 Asimismo también calcularemos el índice de masa corporal (IMC); que se averigua según la siguiente fórmula:
 $$
@@ -137,7 +137,7 @@ Calculamos las nuevas variables y las añadimos al set de datos con el siguiente
 new_data <- data
 # Add ASC
 new_data[["ASC"]] <- exp(
-  log(new_data[["weight"]]) * 0.425 + log(new_data[["height"]]) * 0.725 + 1.8564)
+  log(new_data[["weight"]]) * 0.425 + log(new_data[["height"]]) * 0.725 + log(0.007184))
 # Add IMC
 new_data[["IMC"]] <- new_data[["weight"]]/(new_data[["height"]]/100)^2
 
@@ -223,6 +223,63 @@ abline(h = -vc, col = "red")
 Sin embargo, aunque hayamos definido ese valor como un _outlier_ no sabemos si aparece en la muestra por alguna razón anómala (p.e. error al codificar las medidas) o si realmente ese tipo de valores existen en la población a estudiar, así que no lo eliminaremos. Tampoco hemos comprobado si ese valor único ejerce una influencia desproporcionada en los resultados de la regresión.
 
 
+## 1d. Réplica de los gráficos A, B, C y D de @chan2006estimating
+
+
+```{r}
+# Grouping by sex
+grupo <- as.numeric(as.factor(new_data[["gender"]]))
+```
+
+```{r chang graphic function}
+## Function that draws graphics similars to those in the Chang paper ##
+
+chang_draw <- function(x, y, datos, xlabel, ylabel){
+# Colors
+  colors <- c("red", "blue")
+# Regression models
+LM_male <- lm(y ~ x, data = datos, subset = (gender == "M"))
+LM_female <- lm(y ~ x, data = datos, subset =(gender == "F"))
+  
+  # Scatterplot
+plot(y ~ x, data = datos,
+     pch = c(1,0)[grupo],
+     col = colors[grupo],
+     xlab = xlabel,
+     ylab = ylabel
+     )
+
+# Regression lines
+abline(LM_male, col = colors[2])
+abline(LM_female, col = colors[1], lty = 2)
+# Legend
+legend("topleft", rep(c("Female", "Male"), 2), col = colors,
+       pch = c(1,0,NA,NA), lty = c(0,0,2, 1), inset = 0.05, bty = 'n',
+       cex = 0.8, pt.cex = 0.8)
+# R-squared text
+legend("bottomright", c(paste("R-squared fem:", round(summary(LM_female)[["r.squared"]],2)),
+                        paste("R-squared male:", round(summary(LM_male)[["r.squared"]],2))),
+       text.col = colors, inset = 0.05, bty = 'n', cex = 0.8)
+
+# legend("bottomright", legend = c(nrow(data[data$gender == "M",]), nrow(data[data$gender == "F",])))
+}
+```
+
+```{r draw graphs, fig.height=8, fig.width=8}
+# Draw the four graphs from Chang (2011)
+attach(new_data)
+
+par(mfrow=c(2,2))
+chang_draw(ASC, liver_weight, new_data, xlabel = "Área corporal (metros cuadrados)", ylabel = "Peso calculado del hígado (g)")
+chang_draw(weight, liver_weight, new_data, xlabel = "Peso corporal (kg)", ylabel = "Peso calculado del hígado (g)")
+chang_draw(height, liver_weight, new_data, xlabel = "Altura corporal (cm)", ylabel = "Peso calculado del hígado (g)")
+
+plot(liver_volume ~ liver_weight, data = new_data, pch = 0, xlab = "Peso calculado del hígado (g)", ylab = "Volumen del hígado (mL)")
+abline(lm(liver_volume ~ liver_weight, data = new_data))
+legend("bottomright", paste("R-squared:", round(summary(lm(liver_volume ~ liver_weight))[["r.squared"]],2)), inset = 0.05, bty = 'n', cex = 0.8)
+```
+
+Tanto en hombres como mujeres, el área y el peso corporal presentan cierta relación con el peso calculado del hígado, pero débil. La altura corporal está incluso menos correlacionada con el peso calculado del hígado.
 
 
 
