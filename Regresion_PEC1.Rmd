@@ -275,8 +275,14 @@ chang_draw(weight, liver_weight, new_data, xlabel = "Peso corporal (kg)", ylabel
 chang_draw(height, liver_weight, new_data, xlabel = "Altura corporal (cm)", ylabel = "Peso calculado del hígado (g)")
 
 plot(liver_volume ~ liver_weight, data = new_data, pch = 0, xlab = "Peso calculado del hígado (g)", ylab = "Volumen del hígado (mL)")
-abline(lm(liver_volume ~ liver_weight, data = new_data))
-legend("bottomright", paste("R-squared:", round(summary(lm(liver_volume ~ liver_weight))[["r.squared"]],2)), inset = 0.05, bty = 'n', cex = 0.8)
+# ajuste a la recta de regresion
+vol_weight_mod <- lm(liver_volume ~ liver_weight, data = new_data)
+abline(vol_weight_mod)
+legend("bottomright", paste("R-squared:", round(summary(vol_weight_mod)[["r.squared"]],2)), inset = 0.05, bty = 'n', cex = 0.8)
+# Predict volume for weight 1000
+lw1000 <- predict(vol_weight_mod, data.frame(liver_weight = 1000))
+segments(1000, 0, y1 = lw1000)
+segments(0, lw1000, x1 = 1000)
 ```
 
 Tanto en hombres como mujeres, el área y el peso corporal presentan cierta relación con el peso calculado del hígado, pero débil. La altura corporal está incluso menos correlacionada con el peso calculado del hígado.
