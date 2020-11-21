@@ -282,11 +282,11 @@ legend("bottomright", paste("R-squared:", round(summary(lm(liver_volume ~ liver_
 Tanto en hombres como mujeres, el área y el peso corporal presentan cierta relación con el peso calculado del hígado, pero débil. La altura corporal está incluso menos correlacionada con el peso calculado del hígado.
 
 
-## 1e. Comprueba si las rectas de regresión de la primera gráfica son paralelas
+## 1e. Comprobar coincidencia y paralelismo de las rectas de la primera figura
 
-Cuando queremos saber si dos rectas son paralelas, básicamente nos estamos haciendo la pregunta de si ambas rectas tienen la misma pendiente. Esto es, trabajaremos con la hipótesis nula de que la pendiente de ambas rectas es la misma:
+Cuando queremos saber si dos rectas son iguales, básicamente nos estamos haciendo la pregunta de si ambas rectas tienen la misma pendiente y el mismo punto de corte con el eje _y_. Esto es, queremos contrastar la siguiente hipótesis nula:
 $$
-H_0: \beta_{females} = \beta_{males}
+H_0: \beta_{females} = \beta_{males}; \alpha_{females} = \alpha_{males}
 $$
 
 Matemáticamente existen varias formas de comprobar la hipótesis, pero aquí utilizaremos una de las más sencillas (con las herramientas de las que disponemos), el **análisis de la covarianza**.
@@ -308,6 +308,10 @@ anova(modelo_area_genero)
 ```
 
 Vemos en la tabla que el contraste ASC:gender (área:género) no es significativo para un nivel de significatividad del 5%, y por tanto no tenemos razones para rechazar la hipótesis nula de igualdad de pendientes. Esto es, concluimos que **las rectas de regresión para hembras y machos son paralelas**.
+
+El contraste que nos permite interrogar la diferencia entre los términos independientes de ambas rectas es el contraste de la variable _gender_, que no es significativo para un nivel de significatividad del 5%. Eso significa que no tenemos razones para rechazar la hipótesis nula de igualdad del punto de intercepción con el eje de ordenadas. Esto es, concluimos que **ambas rectas intersectan con el eje _y_ en el mismo punto**.
+
+Dado que consideramos que ambas rectas tienen la misma pendiente y el mismo punto de intersección con el eje _y_, **no rechazamos la hipótesis de que se trata de la misma recta en los dos grupos**.
 
 
 
