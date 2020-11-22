@@ -73,6 +73,8 @@ file.remove(
 # Load packages
 library(knitr)
 library(tseries)
+library(faraway)
+library(car)
 ```
 
 # Ejercicio 1. Estimación del peso del hígado
@@ -320,6 +322,198 @@ El contraste que nos permite interrogar la diferencia entre los términos indepe
 Dado que consideramos que ambas rectas tienen la misma pendiente y el mismo punto de intersección con el eje _y_, **no rechazamos la hipótesis de que se trata de la misma recta en los dos grupos**.
 
 
+## 1e. Regresión múltiple
+
+**Variable respuesta:** Peso estimado del hígado (_liver_weight_).
+
+**Variables regresoras:** Género, peso, altura, ASC (BSA) e IMC (BMI).
+
+Vamos a utilizar R para generar el siguiente modelo lineal:
+$$
+\text{PESO CALCULADO} = \beta_0 + \beta_{1}\text{GÉNERO} + \beta_{2}\text{PESO} + \beta_{3}\text{ALTURA} + \beta_{4}\text{ASC} + \beta_{5}\text{IMC}
+$$
+
+```{r}
+# Ajuste a modelo multivariante
+mod_multiple <- lm(liver_weight ~ gender + weight + height + ASC + IMC, data = new_data)
+summary(mod_multiple)
+```
+
+La fórmula que define el plano estimado es (redondeando los coeficientes al segundo dígito significativo):
+$$
+\hat y = 3050 + 50x_{género} + 39x_{peso} - 17x_{altura} - 68x_{ASC} - 67x_{IMC}
+$$
+
+Sin embargo, el coeficiente de determinación ajustado R^2 = `r round(summary(mod_multiple)[["adj.r.squared"]], digits = 2)` nos informa de que el modelo está lejos de ser perfecto a la hora de explicar la variación (o de predecir) de la variable respuesta.
+
+
+### Análisis de los residuos
+
+Los modelos estadísticos y las pruebas que los contrastan se basan en una serie de asunciones acerca de los datos de origen. Cuando más se aparten los datos de dichas asunciones menos fiables serán las conclusiones a las que lleguemos. El análisis de los residuos nos permite chequear si dichas asunciones se cumplen en los datos con los que estamos trabajando.
+
+#### Comprobación de la homocedasticidad (varianza constante)
+
+Necesitamos saber si la varianza se mantiene constante independientemente de los valores que adopten las variables regresoras. Esto lo podemos investigar representando el valor absoluto de los residuos frente a los valores esperados de la variable respuesta:
+
+```{r}
+plot(fitted(mod_multiple), abs(residuals(mod_multiple)),
+     xlab = "Valores esperados", ylab = "Residuos (valor absoluto)")
+abline(lm(abs(residuals(mod_multiple)) ~ fitted(mod_multiple)),
+       col = "blue")
+```
+
+Diría que la varianza aumenta para valores esperados mayores, pero para asegurarnos podríamos ajustar los puntos del gráfico a un modelo de regresión y comprobar si la pendiente de la recta es estadísticamente significativa (nivel de significatividad del 5%):
+
+```{r}
+summary(lm(abs(residuals(mod_multiple)) ~ fitted(mod_multiple)))
+```
+
+Efectivamente, el p-valor de la pendiente nos permite rechazar la hipótesis nula de que la pendiente es 0. Por tanto, llegamos a la conclusión de que la varianza no es constante para todos los valores esperados, sino que es mayor cuanto mayores son dichos valores.
+
+
+#### Normalidad
+
+Otra asunción es que los residuos siguen la distribución normal. Una manera típica de comprobarlo es mediante su representación en una gráfica Q-Q ó mediante el test de Shapiro-Wilk:
+```{r}
+qqnorm(residuals(mod_multiple), ylab = "Residuos", xlab = "Cuantiles")
+qqline(residuals(mod_multiple))
+```
+
+Los residuos parecen apartarse de la distribución normal en los cuantiles más altos.
+
+```{r}
+shapiro.test(residuals(mod_multiple))
+```
+
+Y, efectivamente, el test de Shapiro-wilk nos anima a rechazar la hipótesis de que la distribución de los residuos es igual a la distribución normal.
+
+
+#### Leverage
+
+Otra comprobación que podemos hacer es la de la existencia de residuos con valores muy alejados de la media que tienen el potencial de influir excesivamente en el ajuste de valores al modelo. Podemos hacer una búsqueda gráfica de los mismos:
+
+```{r}
+hat_mod <- hatvalues(mod_multiple)
+p <- length(mod_multiple$coefficients)
+n <- length(mod_multiple$fitted.values)
+leverage_mean <- p/n
+
+
+plot(hat_mod, type = 'h')
+abline(h=2*leverage_mean, col = "red")
+```
+
+La regla general para identificar a ojo los valores con potencialmente excesivo leverage, es que superen en más del doble la media del _leverage_ de todas las observaciones (en la gráfica señalado con una línea roja). En nuestro set de datos, esas observaciones son:
+```{r}
+names(which(hat_mod > 2*leverage_mean))
+```
+
+Una vez localizadas esas observaciones podremos que decidir qué hacer con ellas, si algo hacemos.
+
+
+#### Valores atípicos
+
+Los valores atípicos son puntos que no se ajustan bien al modelo y que podrían afectar al ajuste del resto de valores. Para detectar estadísticamente estos valores, un método es estudentizar los residuos y comprobar que se adapten a una distribución _t_.
+
+```{r}
+estudentizados <- rstudent(mod_multiple)
+limites <- abs(qt(0.05/n*2, n-p-2))
+
+plot(estudentizados, type = 'h')
+abline(h=limites, col="red"); abline(h=0); abline(h=-limites, col = "red")
+```
+
+Sólo encontramos un par de valores atípicos, que podemos identificar de esta forma:
+```{r}
+names(which(abs(estudentizados) > limites))
+```
+
+Una vez identificadas las observaciones que consideramos valores atípicos podemos examinarlas, intentar encontrar una razón por la que presentan valores extremos, y decidir qué hacer al respecto; si algo hacemos.
+
+
+#### Observaciones influyentes
+
+Los puntos influyentes son aquellos que, si los eliminásemos del set de datos, provocarían un gran cambio en el ajuste. Puede coincidir que sean valores atípicos, o que tengan un leverage alto, pero no necesariamente. Existen diferentes medidas de influencia; en esta ocasión usaremos la distancia de Cook y la representaremos frente a los cuartiles de una distribución seminormal:
+
+```{r}
+cook <- cooks.distance(mod_multiple)
+halfnorm(cook, nlab = 4, ylab = "Distancias de Cook")
+```
+
+En este gráfico hemos identificado los residuos con mayor distancia de Cook pero, ¿cómo decidimos cuáles son (excesivamente) influyentes? Un posible criterio consiste en identificar aquellos con una distancia de Cook que sobrepase el valor crítico $4/n-k-1$:
+
+```{r}
+plot(mod_multiple, which = 4)
+# p - 2 because p = k + 1
+abline(h=4/(n-p-2), col = "red")
+```
+
+Si queremos identificarlos a todos:
+
+```{r}
+names(which(cook > 4/(n-p-2)))
+```
+
+También podemos resumir la situación en un único gráfico:
+
+```{r, fig.cap="Gráfico de influencia sobre la regresión. El área de los círculos es proporcional al valor de la distancia de Cook. Las líneas verticales representan valores dos y tres veces superiores a la media del valor hat. Las líneas horizontales marcan el origen y los valores 2 y -2 de la escala de residuos estudentizados."}
+influencePlot(mod_multiple, 
+              xlab = "Valores hat", ylab = "Residuos estudentizados")
+```
+
+En este gráfico apreciamos que de los cuatro puntos con mayor distancia de Cook, dos de ellos tienen los mayores valores hat y los otros dos tienen valores residuales extremadamente grandes.
+
+
+#### Estructura del modelo
+
+El estudio de los residuos también puede ayudar a detectar deficiencias en la parte estructural del modelo. Existen múltiples formas de afrontar estas comprobaciones, generalmente de forma gráfica como la representación de residuos frente a *x_i* o frente a $\hat y$ (como ya hicimos anteriormente al comprobar la homocedasticidad).
+
+Para esta sección informe nos decantaremos por el uso de gráficas de _regresión parcial_ como las explicadas en Faraway (2011), que consisten en representar los residuos resultantes de hacer regresión de _y_ sobre todas _x_ excepto *x_i*, frente a los residuos de hacer la regresión de *x_i* frente a todo _x_ excepto *x_i*. Esperamos que los gráficos resultantes no muestren ninguna estructura remarcable.
+
+Debido a constricciones de tiempo, no investigaremos todas las variables regresoras, sino que a modo de ejemplo nos limitaremos a estudiar la regresión parcial de la variable peso ( _weight_ ):
+
+```{r}
+# Partial regressions
+partial_yx <- residuals(lm(liver_weight ~ . - weight, new_data))
+partial_xx <- residuals(lm(weight ~ . - weight, new_data))
+plot(partial_xx , partial_yx,
+     xlab = "Residuos de peso corporal", ylab = "Residuos de peso calculado del hígado")
+abline(lm(partial_yx ~ partial_xx), col="blue")
+```
+
+Como esperado, nada reseñable. La distribución de puntos incluso parece aproximada a la de una normal bivariante, y si ajustamos una recta de regresión, esta presenta pendiente cero.
+
+
+### Multicolinearidad
+
+La multicolinearidad ocurre cuando dos o más variables regresoras (en un modelo de regresión múltiple) están relacionadas linealmente, de forma que cambios en una variable afectan a otra variable de forma predecible. Esta propiedad del set de datos afecta al análisis de cada variable regresora individual (p.e. para comprobar qué variables afectan a la precisión del modelo).
+
+Sospechamos que en nuestro set de datos puede haber multicolinearidad, porque las variables _ASC_ e _IMC_ están calculadas a partir del peso y la altura de cada individuo. Además, las variables peso y altura (como vimos en el gráfico del apartado 1c) también parecen estar relacionadas entre sí al menos de forma parcial.
+
+Una forma de detectar la multicolinearidad es mediante los llamados factores de inflación de la varianza (FIV), que son los elementos de la diagonal de la inversa de la matriz de correlaciones entre variables. Al comparar en FIV de una variable con el R^2 de dicha variable estamos midiendo el incremento en la varianza de los estimadores regresión comparada con el valor que debería tener la varianza si las variables no estuvieran relacionadas.
+
+$$
+\text{FIV}_j = (1 - R^2_j)^{-1}
+$$
+
+En el caso de nuestro set de datos:
+```{r}
+# We select all columns except the first
+# because it is a categorical one
+diag(solve(cor(new_data[, -1])))
+```
+
+Según autores, se considera que los datos presentan un problema de multicolinearidad cuando los FIVs tienen valores por encima de 5 ó 10. En nuestro caso se diría que sí **tenemos un problema de multicolinearidad**. Y grande.
+
+Por comparar, vamos a calcular los FIVs para la matriz de datos sin las variables _ASC_ e _IMC_:
+
+```{r}
+# We select all columns except the first
+# because it is a categorical one
+diag(solve(cor(data[, -1])))
+```
+
+Si decidimos poner el límite en FIV = 10, o si utilizamos la media de todos los FIV (`r mean(diag(solve(cor(data[, -1])))) `), diríamos que en este set de datos **sin _ASC_ ni _IMC_ no tenemos problemas de multicolinearidad importantes**.
 
 <!-- # Apéndice A: Código -->
 
