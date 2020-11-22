@@ -583,6 +583,67 @@ Nuestro modelo completo predice un peso calculado del hígado de `r round(predi_
 La predicción puntual usando el modelo simplificado de Chan para una donante de 54 kg es un peso calculado de hígado de `r round(predi_chan[[1]])` gramos.
 
 
+# Ejercicio 2. Habituación y serpientes
+
+### 2a. Datos
+
+Primeramente registraremos los datos en un formato con el que podamos trabajar en R, y que además nos resulte cómodo para análisis posteriores (formato largo).
+```{r}
+snake_ID <- rep(c("D1", "D3", "D5", "D8", "De", "Dt"), 4)
+Day <- rep(c("Day_1", "Day_2", "Day_3", "Day_4"), each = 6)
+Day_1 <- c(85, 107, 61, 22, 40, 65)
+Day_2 <- c(58, 51, 60, 41, 45, 27)
+Day_3 <- c(15, 30, 68, 63, 28, 3)
+Day_4 <- c(57, 12, 36, 21, 10, 16)
+Trials <- c(Day_1, Day_2, Day_3, Day_4)
+
+snakes_long <- data.frame(snake_ID, Day, Trials)
+
+head(snakes_long)
+```
+
+Diseñamos el modelo lineal en R:
+```{r}
+mod_snakes <- lm(Trials ~ snake_ID + Day, data = snakes_long)
+summary(mod_snakes)
+```
+
+### Gráfico de barras
+```{r}
+n <- 6
+# Calculate mean
+snek_mean <-
+  sapply(split(snakes_long$Trials, snakes_long$Day), mean)
+# Calculate SE
+snek_se <- sapply(split(snakes_long$Trials, snakes_long$Day), sd) / sqrt(n)
+# Calculate CI
+alpha <- 0.05
+t=qt((1-alpha)/2 + .5, n-1)
+snek_ci <- t * snek_se
+
+# Function for error bars
+# Adapted from
+# https://www.r-graph-gallery.com/4-barplot-with-error-bar.html
+
+errorbar <- function(x, y, upper, lower=upper, length=0.1,...){
+  arrows(x,y+upper, x, y-lower, angle=90, code=3, length=length, ...)
+}
+
+
+snek_barplot <- barplot(snek_mean, # ylim will accomodate CI bars
+                        ylim = c(0, round(sum(max(snek_ci)+max(snek_mean)), -2)),
+                        ylab = "Trials",
+                        xlab = "Days")
+errorbar(snek_barplot, snek_mean, snek_ci, length = 0)
+```
+
+
+
+
+
+
+
+
 <!-- # Apéndice A: Código -->
 
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
