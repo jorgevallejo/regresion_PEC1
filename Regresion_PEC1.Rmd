@@ -736,6 +736,44 @@ round(beta)
 
 ## 3b. Contrastar la no interacción.
 
+Añadimos el producto de los estimadores $\hat \alpha_i$ y $\hat \beta_i$ a la matriz de datos para generar un nuevo modelo de regresión que nos permita contrastar este modelo de interacción con el modelo sin interacción (aditivo).
+
+```{r}
+# Generate the new parameter columns
+alpha_hat <- rep(alfa, 4)
+day_hat <- rep(beta, each=6)
+lambda <- alpha_hat * day_hat
+
+# Add new columns to the data matrix
+snakes_long_int <- cbind(snakes_long, alpha_hat, day_hat, lambda)
+head(snakes_long_int)
+
+```
+
+Para contrastar la hipótesis nula $H_0: \lambda = 0$ ajustaremos este nuevo modelo a los datos que incluyen el estimador $\hat \lambda$ de interacción y lo compararemos mediante la tabla ANOVA con el modelo más simple que no incluye el estimador de interacción.
+
+```{r}
+# Fitting data to the new model
+mod_snake_int <- lm(Trials ~ snake_ID + Day + lambda, data = snakes_long_int )
+sumary(mod_snake_int)
+```
+
+Es interesante ver que los coeficientes para los otros parámetros coinciden con los del modelo aditivo (en el apartado 2a). El coeficiente para $\lambda$ es pequeño y además no parece significativo (para un nivel de significatividad del 5%).
+
+Si realizamos el contraste entre ambos modelos:
+```{r}
+anova(mod_snakes, mod_snake_int)
+```
+
+Efectivamente, no podemos rechazar la hipótesis nula de que $\lambda$ es cero. Por tanto concluimos que **no se puede detectar que haya interacción entre los parámetros _SnakeID_ y _Day_**.
+
+
+## 3c. Realizar el contraste de Tukey con una función de R
+
+
+
+
+
 
 
 

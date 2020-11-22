@@ -217,6 +217,7 @@ summary {
 <li><a href="#ejercicio-3.-prueba-de-aditividad-de-tukey">Ejercicio 3. Prueba de aditividad de Tukey</a><ul>
 <li><a href="#a.-estimar-los-parámetros-del-modelo-sin-interacción">3a. Estimar los parámetros del modelo sin interacción</a></li>
 <li><a href="#b.-contrastar-la-no-interacción.">3b. Contrastar la no interacción.</a></li>
+<li><a href="#c.-realizar-el-contraste-de-tukey-con-una-función-de-r">3c. Realizar el contraste de Tukey con una función de R</a></li>
 </ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
@@ -946,6 +947,53 @@ beta &lt;- marginal_day - mu</code></pre>
 </div>
 <div id="b.-contrastar-la-no-interacción." class="section level2">
 <h2>3b. Contrastar la no interacción.</h2>
+<p>Añadimos el producto de los estimadores <span class="math inline">\(\hat \alpha_i\)</span> y <span class="math inline">\(\hat \beta_i\)</span> a la matriz de datos para generar un nuevo modelo de regresión que nos permita contrastar este modelo de interacción con el modelo sin interacción (aditivo).</p>
+<pre class="r"><code># Generate the new parameter columns
+alpha_hat &lt;- rep(alfa, 4)
+day_hat &lt;- rep(beta, each=6)
+lambda &lt;- alpha_hat * day_hat
+
+# Add new columns to the data matrix
+snakes_long_int &lt;- cbind(snakes_long, alpha_hat, day_hat, lambda)
+head(snakes_long_int)</code></pre>
+<pre><code>##   snake_ID   Day Trials  alpha_hat  day_hat    lambda
+## 1       D1 Day_1     85  11.208333 20.79167  233.0399
+## 2       D3 Day_1    107   7.458333 20.79167  155.0712
+## 3       D5 Day_1     61  13.708333 20.79167  285.0191
+## 4       D8 Day_1     22  -5.791667 20.79167 -120.4184
+## 5       De Day_1     40 -11.791667 20.79167 -245.1684
+## 6       Dt Day_1     65 -14.791667 20.79167 -307.5434</code></pre>
+<p>Para contrastar la hipótesis nula <span class="math inline">\(H_0: \lambda = 0\)</span> ajustaremos este nuevo modelo a los datos que incluyen el estimador <span class="math inline">\(\hat \lambda\)</span> de interacción y lo compararemos mediante la tabla ANOVA con el modelo más simple que no incluye el estimador de interacción.</p>
+<pre class="r"><code># Fitting data to the new model
+mod_snake_int &lt;- lm(Trials ~ snake_ID + Day + lambda, data = snakes_long_int )
+sumary(mod_snake_int)</code></pre>
+<pre><code>##               Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)  74.541667  13.954413  5.3418 0.000104
+## snake_IDD3   -3.750000  16.113168 -0.2327 0.819340
+## snake_IDD5    2.500000  16.113168  0.1552 0.878916
+## snake_IDD8  -17.000000  16.113168 -1.0550 0.309276
+## snake_IDDe  -23.000000  16.113168 -1.4274 0.175387
+## snake_IDDt  -26.000000  16.113168 -1.6136 0.128923
+## DayDay_2    -16.333333  13.156347 -1.2415 0.234827
+## DayDay_3    -28.833333  13.156347 -2.1916 0.045816
+## DayDay_4    -38.000000  13.156347 -2.8883 0.011913
+## lambda        0.011101   0.028980  0.3831 0.707417
+## 
+## n = 24, p = 10, Residual SE = 22.78746, R-Squared = 0.52</code></pre>
+<p>Es interesante ver que los coeficientes para los otros parámetros coinciden con los del modelo aditivo (en el apartado 2a). El coeficiente para <span class="math inline">\(\lambda\)</span> es pequeño y además no parece significativo (para un nivel de significatividad del 5%).</p>
+<p>Si realizamos el contraste entre ambos modelos:</p>
+<pre class="r"><code>anova(mod_snakes, mod_snake_int)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: Trials ~ snake_ID + Day
+## Model 2: Trials ~ snake_ID + Day + lambda
+##   Res.Df    RSS Df Sum of Sq      F Pr(&gt;F)
+## 1     15 7346.0                           
+## 2     14 7269.8  1    76.201 0.1467 0.7074</code></pre>
+<p>Efectivamente, no podemos rechazar la hipótesis nula de que <span class="math inline">\(\lambda\)</span> es cero. Por tanto concluimos que <strong>no se puede detectar que haya interacción entre los parámetros <em>SnakeID</em> y <em>Day</em></strong>.</p>
+</div>
+<div id="c.-realizar-el-contraste-de-tukey-con-una-función-de-r" class="section level2">
+<h2>3c. Realizar el contraste de Tukey con una función de R</h2>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
