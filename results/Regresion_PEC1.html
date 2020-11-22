@@ -994,6 +994,52 @@ sumary(mod_snake_int)</code></pre>
 </div>
 <div id="c.-realizar-el-contraste-de-tukey-con-una-función-de-r" class="section level2">
 <h2>3c. Realizar el contraste de Tukey con una función de R</h2>
+<p>Siguiendo las indicaciones de (<a href="https://rpubs.com/wgalvord/335035" class="uri">https://rpubs.com/wgalvord/335035</a>) realizaremos el contraste anterior utilizando esta vez la función <code>tukey.1df</code> del paquete <code>dae</code>.</p>
+<p>En primer lugar usamos la función <code>aov</code> para ajustar el modelo aditivo añadiendo el término <code>Error</code> como al parámetro <code>SnakeId</code> anidado en <code>Day</code>.</p>
+<pre class="r"><code>(snake_adit_Error_aov &lt;- aov(Trials ~ Day + snake_ID + Error(Day/snake_ID)))</code></pre>
+<pre><code>## 
+## Call:
+## aov(formula = Trials ~ Day + snake_ID + Error(Day/snake_ID))
+## 
+## Grand Mean: 42.54167
+## 
+## Stratum 1: Day
+## 
+## Terms:
+##                      Day
+## Sum of Squares  4877.792
+## Deg. of Freedom        3
+## 
+## Estimated effects may be unbalanced
+## 
+## Stratum 2: Day:snake_ID
+## 
+## Terms:
+##                 snake_ID Residuals
+## Sum of Squares  3042.208  7345.958
+## Deg. of Freedom        5        15
+## 
+## Residual standard error: 22.12986
+## Estimated effects may be unbalanced</code></pre>
+<p>Seguidamente, ajustaremos el objeto <code>aov</code> que acabamos de obtener con la función <code>tukey.1df</code> del paquete <code>dae</code>.</p>
+<pre class="r"><code>tukey_1df_snake_adit_Error_aov &lt;-
+  tukey.1df(aov.obj = snake_adit_Error_aov,
+            data = snakes_long,
+            error.term = 'Day:snake_ID')
+
+tukey_1df_snake_adit_Error_aov</code></pre>
+<pre><code>## $Tukey.SS
+## [1] 76.20111
+## 
+## $Tukey.F
+## [1] 0.1467471
+## 
+## $Tukey.p
+## [1] 0.7074173
+## 
+## $Devn.SS
+## [1] 7269.757</code></pre>
+<p>El valor <code>Tukey.p</code> es el p-valor asociado al estimador de <span class="math inline">\(\lambda\)</span>, que podemos comprobar que es igual al que obtuvimos en el apartado 2b, igualmente no significativo y por el que concluimos que no debe de haber interacción entre los parámetros <code>Day</code> y <code>snake_ID</code>.</p>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->

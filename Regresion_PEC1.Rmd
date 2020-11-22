@@ -76,6 +76,7 @@ library(tseries)
 library(faraway)
 library(car)
 library(MASS)
+library(dae)
 ```
 
 # Ejercicio 1. Estimación del peso del hígado
@@ -770,11 +771,26 @@ Efectivamente, no podemos rechazar la hipótesis nula de que $\lambda$ es cero. 
 
 ## 3c. Realizar el contraste de Tukey con una función de R
 
+Siguiendo las indicaciones de (https://rpubs.com/wgalvord/335035) realizaremos el contraste anterior utilizando esta vez la función `tukey.1df` del paquete `dae`.
 
+En primer lugar usamos la función `aov` para ajustar el modelo aditivo añadiendo el término `Error` como al parámetro `SnakeId` anidado en `Day`.
 
+```{r}
+(snake_adit_Error_aov <- aov(Trials ~ Day + snake_ID + Error(Day/snake_ID)))
+```
 
+Seguidamente, ajustaremos el objeto `aov` que acabamos de obtener con la función `tukey.1df` del paquete `dae`.
 
+```{r}
+tukey_1df_snake_adit_Error_aov <-
+  tukey.1df(aov.obj = snake_adit_Error_aov,
+            data = snakes_long,
+            error.term = 'Day:snake_ID')
 
+tukey_1df_snake_adit_Error_aov
+```
+
+El valor `Tukey.p` es el p-valor asociado al estimador de $\lambda$, que podemos comprobar que es igual al que obtuvimos en el apartado 2b, igualmente no significativo y por el que concluimos que no debe de haber interacción entre los parámetros `Day` y `snake_ID`.
 
 
 
