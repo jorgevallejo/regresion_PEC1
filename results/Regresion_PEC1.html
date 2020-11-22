@@ -214,6 +214,9 @@ summary {
 <li><a href="#solución-con-la-función-lm-de-r">Solución con la función lm() de R</a></li>
 </ul></li>
 </ul></li>
+<li><a href="#ejercicio-3.-prueba-de-aditividad-de-tukey">Ejercicio 3. Prueba de aditividad de Tukey</a><ul>
+<li><a href="#a.-estimar-los-parámetros-del-modelo-sin-interacción">3a. Estimar los parámetros del modelo sin interacción</a></li>
+</ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
 </div>
@@ -881,7 +884,7 @@ design_matrix &lt;- cbind(DayDay_1, snake_IDD1, design_matrix)
 \mathbf{(A'A)^{-1}x = A'b}
 \]</span> Donde <strong>A</strong> es la matriz de diseño, <strong>x</strong> son parámetros, y <strong>b</strong> es el vector de la variable respuesta <em>Trials</em>.</p>
 <p>Queremos conocer <strong>x</strong>: <span class="math display">\[
-\mathbf{x = A'b(A'A)^-
+\mathbf{x = A'b(A'A)^-}
 \]</span></p>
 <p>En el lenguaje R podemos hacer el cálculo mediante la función <code>ginv()</code> del paquete <code>MASS</code>:</p>
 <pre class="r"><code># Calcular el vector de coeficientes
@@ -912,6 +915,28 @@ A &lt;- design_matrix
 ##    DayDay_2    DayDay_3    DayDay_4 
 ##   -16.33333   -28.83333   -38.00000</code></pre>
 <p>Observamos que la función <code>lm()</code> ha eliminado los parámetros <em>Day1</em> y <em>D2</em> para generar una matriz de diseño de rango máximo y solución definida. Vemos también que los valores de los coeficientes aquí calculados no se parecen a los que hemos calculado mediante g-inversa.</p>
+</div>
+</div>
+</div>
+<div id="ejercicio-3.-prueba-de-aditividad-de-tukey" class="section level1">
+<h1>Ejercicio 3. Prueba de aditividad de Tukey</h1>
+<div id="a.-estimar-los-parámetros-del-modelo-sin-interacción" class="section level2">
+<h2>3a. Estimar los parámetros del modelo sin interacción</h2>
+<pre class="r"><code># Grand mean
+mu &lt;- mean(Trials)
+# Marginal snake means
+marginal_snake &lt;- sapply(split(snakes_long$Trials, snakes_long$snake_ID), mean)
+# Marginal day means
+marginal_day &lt;- snek_mean</code></pre>
+<p><span class="math inline">\(\hat \mu\)</span> = 43</p>
+<p><span class="math inline">\(\hat \alpha\)</span> =</p>
+<pre class="r"><code>round(marginal_snake)</code></pre>
+<pre><code>## D1 D3 D5 D8 De Dt 
+## 54 50 56 37 31 28</code></pre>
+<p><span class="math inline">\(\hat \beta\)</span> =</p>
+<pre class="r"><code>round(marginal_day)</code></pre>
+<pre><code>## Day_1 Day_2 Day_3 Day_4 
+##    63    47    34    25</code></pre>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
@@ -919,7 +944,6 @@ A &lt;- design_matrix
 <!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
 <!-- sessionInfo() # For better reproducibility -->
 <!-- ``` -->
-</div>
 </div>
 </div>
 <div id="referencias" class="section level1 unnumbered">

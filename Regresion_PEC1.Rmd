@@ -673,7 +673,7 @@ Donde **A** es la matriz de diseño, **x** son parámetros, y **b** es el vector
 
 Queremos conocer **x**:
 $$
-\mathbf{x = A'b(A'A)^-
+\mathbf{x = A'b(A'A)^-}
 $$
 
 
@@ -702,7 +702,30 @@ Observamos que la función `lm()` ha eliminado los parámetros _Day1_ y _D2_ par
 
 
 
+# Ejercicio 3. Prueba de aditividad de Tukey
 
+## 3a. Estimar los parámetros del modelo sin interacción
+
+```{r}
+# Grand mean
+mu <- mean(Trials)
+# Marginal snake means
+marginal_snake <- sapply(split(snakes_long$Trials, snakes_long$snake_ID), mean)
+# Marginal day means
+marginal_day <- snek_mean
+```
+
+$\hat \mu$ = `r round(mu)`
+
+$\hat \alpha$ =
+```{r}
+round(marginal_snake)
+```
+
+$\hat \beta$ =
+```{r}
+round(marginal_day)
+```
 
 
 
