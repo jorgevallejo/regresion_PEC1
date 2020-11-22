@@ -216,6 +216,7 @@ summary {
 </ul></li>
 <li><a href="#ejercicio-3.-prueba-de-aditividad-de-tukey">Ejercicio 3. Prueba de aditividad de Tukey</a><ul>
 <li><a href="#a.-estimar-los-parámetros-del-modelo-sin-interacción">3a. Estimar los parámetros del modelo sin interacción</a></li>
+<li><a href="#b.-contrastar-la-no-interacción.">3b. Contrastar la no interacción.</a></li>
 </ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
@@ -927,16 +928,24 @@ mu &lt;- mean(Trials)
 # Marginal snake means
 marginal_snake &lt;- sapply(split(snakes_long$Trials, snakes_long$snake_ID), mean)
 # Marginal day means
-marginal_day &lt;- snek_mean</code></pre>
+marginal_day &lt;- snek_mean
+
+# Alfa
+alfa &lt;- marginal_snake - mu
+# Beta
+beta &lt;- marginal_day - mu</code></pre>
 <p><span class="math inline">\(\hat \mu\)</span> = 43</p>
 <p><span class="math inline">\(\hat \alpha\)</span> =</p>
-<pre class="r"><code>round(marginal_snake)</code></pre>
-<pre><code>## D1 D3 D5 D8 De Dt 
-## 54 50 56 37 31 28</code></pre>
+<pre class="r"><code>round(alfa)</code></pre>
+<pre><code>##  D1  D3  D5  D8  De  Dt 
+##  11   7  14  -6 -12 -15</code></pre>
 <p><span class="math inline">\(\hat \beta\)</span> =</p>
-<pre class="r"><code>round(marginal_day)</code></pre>
+<pre class="r"><code>round(beta)</code></pre>
 <pre><code>## Day_1 Day_2 Day_3 Day_4 
-##    63    47    34    25</code></pre>
+##    21     4    -8   -17</code></pre>
+</div>
+<div id="b.-contrastar-la-no-interacción." class="section level2">
+<h2>3b. Contrastar la no interacción.</h2>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->

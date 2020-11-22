@@ -713,20 +713,28 @@ mu <- mean(Trials)
 marginal_snake <- sapply(split(snakes_long$Trials, snakes_long$snake_ID), mean)
 # Marginal day means
 marginal_day <- snek_mean
+
+# Alfa
+alfa <- marginal_snake - mu
+# Beta
+beta <- marginal_day - mu
 ```
 
 $\hat \mu$ = `r round(mu)`
 
 $\hat \alpha$ =
 ```{r}
-round(marginal_snake)
+round(alfa)
 ```
 
 $\hat \beta$ =
 ```{r}
-round(marginal_day)
+round(beta)
 ```
 
+
+
+## 3b. Contrastar la no interacción.
 
 
 
