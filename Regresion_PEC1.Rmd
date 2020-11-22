@@ -638,9 +638,26 @@ errorbar(snek_barplot, snek_mean, snek_ci, length = 0)
 ```
 
 
+## 2b. Rango de la matriz de diseño
+```{r}
+# Extract design matrix from model
+design_matrix <- model.matrix(mod_snakes)
+DayDay_1 <- c(rep(1, 6), rep(0, 18))
+snake_IDD1 <- rep(c(1,0,0,0,0,0), 4)
+design_matrix <- cbind(DayDay_1, snake_IDD1, design_matrix)
+(design_matrix <- design_matrix[, c(3, 1, 4:6, 2, 7:11)])
+```
 
+### Calcular el rango de la matriz de diseño
 
+Para calcular el rango de la matriz usaré la descomposición QR:
+```{r}
+qr(design_matrix)$rank
+```
 
+**El rango de la matriz de diseño es 9**.
+
+Una matriz es de rango máximo cuando el rango es igual al número de parámatros (columnas). En este caso, **la matriz no es de rango máximo**. Eso conlleva el problema de que el sistema de ecuaciones normales que se desprende de la matriz tiene infinitas soluciones, con lo que no se puede identificar el valor estimado de los coeficientes de las variables del modelo. En este caso probablemente se deba a que contamos con más parámetros (11) que observaciones.
 
 
 
