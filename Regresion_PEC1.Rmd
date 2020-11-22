@@ -75,6 +75,7 @@ library(knitr)
 library(tseries)
 library(faraway)
 library(car)
+library(MASS)
 ```
 
 # Ejercicio 1. Estimación del peso del hígado
@@ -655,9 +656,57 @@ Para calcular el rango de la matriz usaré la descomposición QR:
 qr(design_matrix)$rank
 ```
 
-**El rango de la matriz de diseño es 9**.
+**El rango de la matriz de diseño es 9**. Podemos ver que, efectivamente, la suma de las columnas 2 a 5 da como resultado la columna 1; y asimismo, la suma de las columnas 6 a la 11 también da como resultado la primera columna.
 
 Una matriz es de rango máximo cuando el rango es igual al número de parámatros (columnas). En este caso, **la matriz no es de rango máximo**. Eso conlleva el problema de que el sistema de ecuaciones normales que se desprende de la matriz tiene infinitas soluciones, con lo que no se puede identificar el valor estimado de los coeficientes de las variables del modelo. En este caso probablemente se deba a que contamos con más parámetros (11) que observaciones.
+
+
+## 2c. Calcular una solución de las ecuaciones normales con la matriz g-inversa de Moore-Penrose
+
+La inversa generalizada (g-inverse) de Moore-Penrose es una generalización de la matriz inversa que se usa para calcular la solución que mejor se ajuste a un sistema de ecuaciones lineales que carece de una solución única.
+
+Nuestro problema en notación matricial:
+$$
+\mathbf{(A'A)^{-1}x = A'b}
+$$
+Donde **A** es la matriz de diseño, **x** son parámetros, y **b** es el vector de la variable respuesta _Trials_.
+
+Queremos conocer **x**:
+$$
+\mathbf{x = A'b(A'A)^-
+$$
+
+
+En el lenguaje R podemos hacer el cálculo mediante la función `ginv()` del paquete `MASS`:
+```{r}
+# Calcular el vector de coeficientes
+A <- design_matrix
+(x <- ginv(t(A) %*% A) %*% t(A) %*% Trials)
+```
+
+### Cantidad de g-inversas y de soluciones a las ecuaciones normales de este modelo
+
+Recordemos que esta es sólo una de las soluciones posibles. Las inversas no generalizadas por lo general no son únicas, excepto cuando la matriz es no singular. Sin embargo, en el caso de la inversa de Moore-Penrose esta sí que es única para cada sistema de ecuaciones, por lo que este sistema de ecuaciones, resuelto usando la inversa de Moore-Penrose tiene una sola solución, aunque podríamos encontrar otras soluciones usando diferentes métodos para buscar inversas no generalizadas.
+
+
+### Solución con la función lm() de R
+
+Como ya vimos en el apartado 2a, los coeficientes calculados por la función `lm()` son:
+```{r}
+coef(mod_snakes)
+```
+
+Observamos que la función `lm()` ha eliminado los parámetros _Day1_ y _D2_ para generar una matriz de diseño de rango máximo y solución definida. Vemos también que los valores de los coeficientes aquí calculados no se parecen a los que hemos calculado mediante g-inversa.
+
+
+
+
+
+
+
+
+
+
 
 
 

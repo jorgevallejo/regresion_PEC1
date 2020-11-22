@@ -209,6 +209,10 @@ summary {
 <li><a href="#b.-rango-de-la-matriz-de-diseño">2b. Rango de la matriz de diseño</a><ul>
 <li><a href="#calcular-el-rango-de-la-matriz-de-diseño">Calcular el rango de la matriz de diseño</a></li>
 </ul></li>
+<li><a href="#c.-calcular-una-solución-de-las-ecuaciones-normales-con-la-matriz-g-inversa-de-moore-penrose">2c. Calcular una solución de las ecuaciones normales con la matriz g-inversa de Moore-Penrose</a><ul>
+<li><a href="#cantidad-de-g-inversas-y-de-soluciones-a-las-ecuaciones-normales-de-este-modelo">Cantidad de g-inversas y de soluciones a las ecuaciones normales de este modelo</a></li>
+<li><a href="#solución-con-la-función-lm-de-r">Solución con la función lm() de R</a></li>
+</ul></li>
 </ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
@@ -866,8 +870,48 @@ design_matrix &lt;- cbind(DayDay_1, snake_IDD1, design_matrix)
 <p>Para calcular el rango de la matriz usaré la descomposición QR:</p>
 <pre class="r"><code>qr(design_matrix)$rank</code></pre>
 <pre><code>## [1] 9</code></pre>
-<p><strong>El rango de la matriz de diseño es 9</strong>.</p>
+<p><strong>El rango de la matriz de diseño es 9</strong>. Podemos ver que, efectivamente, la suma de las columnas 2 a 5 da como resultado la columna 1; y asimismo, la suma de las columnas 6 a la 11 también da como resultado la primera columna.</p>
 <p>Una matriz es de rango máximo cuando el rango es igual al número de parámatros (columnas). En este caso, <strong>la matriz no es de rango máximo</strong>. Eso conlleva el problema de que el sistema de ecuaciones normales que se desprende de la matriz tiene infinitas soluciones, con lo que no se puede identificar el valor estimado de los coeficientes de las variables del modelo. En este caso probablemente se deba a que contamos con más parámetros (11) que observaciones.</p>
+</div>
+</div>
+<div id="c.-calcular-una-solución-de-las-ecuaciones-normales-con-la-matriz-g-inversa-de-moore-penrose" class="section level2">
+<h2>2c. Calcular una solución de las ecuaciones normales con la matriz g-inversa de Moore-Penrose</h2>
+<p>La inversa generalizada (g-inverse) de Moore-Penrose es una generalización de la matriz inversa que se usa para calcular la solución que mejor se ajuste a un sistema de ecuaciones lineales que carece de una solución única.</p>
+<p>Nuestro problema en notación matricial: <span class="math display">\[
+\mathbf{(A'A)^{-1}x = A'b}
+\]</span> Donde <strong>A</strong> es la matriz de diseño, <strong>x</strong> son parámetros, y <strong>b</strong> es el vector de la variable respuesta <em>Trials</em>.</p>
+<p>Queremos conocer <strong>x</strong>: <span class="math display">\[
+\mathbf{x = A'b(A'A)^-
+\]</span></p>
+<p>En el lenguaje R podemos hacer el cálculo mediante la función <code>ginv()</code> del paquete <code>MASS</code>:</p>
+<pre class="r"><code># Calcular el vector de coeficientes
+A &lt;- design_matrix
+(x &lt;- ginv(t(A) %*% A) %*% t(A) %*% Trials)</code></pre>
+<pre><code>##             [,1]
+##  [1,] 30.0294118
+##  [2,] 28.2990196
+##  [3,] 12.4632353
+##  [4,] 18.7132353
+##  [5,] -0.7867647
+##  [6,] 16.2132353
+##  [7,] -6.7867647
+##  [8,] -9.7867647
+##  [9,] 11.9656863
+## [10,] -0.5343137
+## [11,] -9.7009804</code></pre>
+<div id="cantidad-de-g-inversas-y-de-soluciones-a-las-ecuaciones-normales-de-este-modelo" class="section level3">
+<h3>Cantidad de g-inversas y de soluciones a las ecuaciones normales de este modelo</h3>
+<p>Recordemos que esta es sólo una de las soluciones posibles. Las inversas no generalizadas por lo general no son únicas, excepto cuando la matriz es no singular. Sin embargo, en el caso de la inversa de Moore-Penrose esta sí que es única para cada sistema de ecuaciones, por lo que este sistema de ecuaciones, resuelto usando la inversa de Moore-Penrose tiene una sola solución, aunque podríamos encontrar otras soluciones usando diferentes métodos para buscar inversas no generalizadas.</p>
+</div>
+<div id="solución-con-la-función-lm-de-r" class="section level3">
+<h3>Solución con la función lm() de R</h3>
+<p>Como ya vimos en el apartado 2a, los coeficientes calculados por la función <code>lm()</code> son:</p>
+<pre class="r"><code>coef(mod_snakes)</code></pre>
+<pre><code>## (Intercept)  snake_IDD3  snake_IDD5  snake_IDD8  snake_IDDe  snake_IDDt 
+##    74.54167    -3.75000     2.50000   -17.00000   -23.00000   -26.00000 
+##    DayDay_2    DayDay_3    DayDay_4 
+##   -16.33333   -28.83333   -38.00000</code></pre>
+<p>Observamos que la función <code>lm()</code> ha eliminado los parámetros <em>Day1</em> y <em>D2</em> para generar una matriz de diseño de rango máximo y solución definida. Vemos también que los valores de los coeficientes aquí calculados no se parecen a los que hemos calculado mediante g-inversa.</p>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
