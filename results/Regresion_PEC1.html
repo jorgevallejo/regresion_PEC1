@@ -201,6 +201,7 @@ summary {
 <li><a href="#análisis-de-los-residuos">Análisis de los residuos</a></li>
 <li><a href="#multicolinearidad">Multicolinearidad</a></li>
 </ul></li>
+<li><a href="#contrastar-un-modelo-más-simple">Contrastar un modelo más simple</a></li>
 </ul></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
@@ -633,6 +634,84 @@ diag(solve(cor(data[, -1])))</code></pre>
 <pre><code>##       weight       height liver_weight liver_volume 
 ##     2.140716     1.469728     8.460148     7.944271</code></pre>
 <p>Si decidimos poner el límite en FIV = 10, o si utilizamos la media de todos los FIV (5.0037158), diríamos que en este set de datos <strong>sin <em>ASC</em> ni <em>IMC</em> no tenemos problemas de multicolinearidad importantes</strong>.</p>
+</div>
+</div>
+<div id="contrastar-un-modelo-más-simple" class="section level2">
+<h2>Contrastar un modelo más simple</h2>
+<p>Como el modelo propuesto por el grupo de Chan se puede interpretar como un modelo anidado en el modelo general, podemos contrastar si ambos modelos son diferentes mediante un ANOVA. Tomemos como hipótesis nula: <span class="math display">\[
+H_0 = \beta_{altura} = \beta_{volumen\ calculado\ del\ hígado} = \beta_{BSA} = \beta_{IMC} = 0 
+\]</span></p>
+<p>Generamos ambos modelos y lo ajustamos a la recta:</p>
+<pre class="r"><code>mod_completo &lt;- lm(liver_weight ~ ., data = new_data)
+sumary(mod_completo)</code></pre>
+<pre><code>##                Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept)   488.31540  874.86027  0.5582  0.57756
+## genderM        37.54444   13.80213  2.7202  0.00729
+## weight         -8.45692   17.96262 -0.4708  0.63846
+## height         -8.97062    9.06837 -0.9892  0.32414
+## liver_volume    0.82519    0.03481 23.7059  &lt; 2e-16
+## ASC           940.63503 1191.08249  0.7897  0.43092
+## IMC            -0.84239   20.60274 -0.0409  0.96744
+## 
+## n = 158, p = 7, Residual SE = 59.92188, R-Squared = 0.89</code></pre>
+<pre class="r"><code>mod_Chan &lt;- lm(liver_weight ~ gender + weight, data = new_data)
+sumary(mod_Chan)</code></pre>
+<pre><code>##             Estimate Std. Error t value  Pr(&gt;|t|)
+## (Intercept) 220.0993    79.8252  2.7573  0.006529
+## genderM      55.7626    26.4463  2.1085  0.036594
+## weight       12.3384     1.4809  8.3315 3.974e-14
+## 
+## n = 158, p = 3, Residual SE = 129.53510, R-Squared = 0.46</code></pre>
+<p>Contrastamos ambos modelos mediante ANOVA:</p>
+<pre class="r"><code>anova(mod_completo, mod_Chan)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: liver_weight ~ gender + weight + height + liver_volume + ASC + 
+##     IMC
+## Model 2: liver_weight ~ gender + weight
+##   Res.Df     RSS Df Sum of Sq      F    Pr(&gt;F)    
+## 1    151  542185                                  
+## 2    155 2600798 -4  -2058613 143.33 &lt; 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+<p>Según el contraste, tenemos razones para rechazar la hipótesis nula y concluir que tener en cuenta sólo género y peso no es suficiente. Sin embargo, esto en con las variables que nosotros hemos estado usando en este informe. Según el artículo de Chan, el modelo completo que ellos contrastan es este: <span class="math display">\[
+\text{PESO CALCULADO} = \beta_0 + \beta_{1}\text{GÉNERO} + \beta_{2}\text{PESO} + \beta_{3}\text{ALTURA}
+\]</span></p>
+<p>Y la hipótesis nula para el modelo simplificado: <span class="math display">\[
+H_0: \beta_{altura} = 0
+\]</span></p>
+<p>Si hacemos el contraste con el nuevo modelo general:</p>
+<pre class="r"><code>mod_completo2 &lt;- lm(liver_weight ~ gender + weight + height, data = new_data)
+
+anova(mod_Chan, mod_completo2)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Model 1: liver_weight ~ gender + weight
+## Model 2: liver_weight ~ gender + weight + height
+##   Res.Df     RSS Df Sum of Sq      F Pr(&gt;F)
+## 1    155 2600798                           
+## 2    154 2600548  1    250.22 0.0148 0.9033</code></pre>
+<p>En esta ocasión vemos en el resultado del contraste que no tenemos razones para rechazar la hipótesis nula de que el valor de la variable altura no afecta a la predicción del peso calculado del hígado. Por tanto, podemos utilizar el modelo simplificado que sólo tiene en cuenta género y peso.</p>
+<div id="estimación-del-intervalo-para-la-media-con-nuestro-modelo-completo" class="section level4">
+<h4>Estimación del intervalo para la media con nuestro modelo completo</h4>
+<p>Teniendo en cuenta una donante de 54kg, y que el resto de sus parámetros estén dentro de la media de nuestro set de datos:</p>
+<pre class="r"><code># Estimacion datos donante
+donante &lt;- data.frame(t(colMeans(new_data[-1])))
+donante[&quot;gender&quot;] &lt;- as.factor(&quot;F&quot;)
+donante[&quot;weight&quot;] &lt;- 54
+
+(predi_completo &lt;- predict(mod_multiple, donante, interval = &quot;prediction&quot;))</code></pre>
+<pre><code>##        fit      lwr      upr
+## 1 826.6583 515.2299 1138.087</code></pre>
+<p>Nuestro modelo completo predice un peso calculado del hígado de 827 gramos, con un intervalo de confianza del 95% entre 515 gramos y 1138 gramos.</p>
+</div>
+<div id="estimación-puntual-con-el-modelo-de-chan" class="section level4">
+<h4>Estimación puntual con el modelo de Chan</h4>
+<pre class="r"><code># Teniendo en cuenta una donante de 54kg
+(predi_chan &lt;- predict(mod_Chan, donante))</code></pre>
+<pre><code>##       1 
+## 886.375</code></pre>
+<p>La predicción puntual usando el modelo simplificado de Chan para una donante de 54 kg es un peso calculado de hígado de 886 gramos.</p>
 <!-- # Apéndice A: Código -->
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
 <!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->

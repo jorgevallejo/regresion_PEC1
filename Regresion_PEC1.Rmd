@@ -515,6 +515,74 @@ diag(solve(cor(data[, -1])))
 
 Si decidimos poner el límite en FIV = 10, o si utilizamos la media de todos los FIV (`r mean(diag(solve(cor(data[, -1])))) `), diríamos que en este set de datos **sin _ASC_ ni _IMC_ no tenemos problemas de multicolinearidad importantes**.
 
+
+## Contrastar un modelo más simple
+
+Como el modelo propuesto por el grupo de Chan se puede interpretar como un modelo anidado en el modelo general, podemos contrastar si ambos modelos son diferentes mediante un ANOVA. Tomemos como hipótesis nula:
+$$
+H_0 = \beta_{altura} = \beta_{volumen\ calculado\ del\ hígado} = \beta_{BSA} = \beta_{IMC} = 0 
+$$
+
+Generamos ambos modelos y lo ajustamos a la recta:
+```{r modelo completo}
+mod_completo <- lm(liver_weight ~ ., data = new_data)
+sumary(mod_completo)
+```
+
+
+
+```{r modelo Chan}
+mod_Chan <- lm(liver_weight ~ gender + weight, data = new_data)
+sumary(mod_Chan)
+```
+
+Contrastamos ambos modelos mediante ANOVA:
+```{r}
+anova(mod_completo, mod_Chan)
+```
+
+Según el contraste, tenemos razones para rechazar la hipótesis nula y concluir que tener en cuenta sólo género y peso no es suficiente. Sin embargo, esto en con las variables que nosotros hemos estado usando en este informe. Según el artículo de Chan, el modelo completo que ellos contrastan es este:
+$$
+\text{PESO CALCULADO} = \beta_0 + \beta_{1}\text{GÉNERO} + \beta_{2}\text{PESO} + \beta_{3}\text{ALTURA}
+$$
+
+Y la hipótesis nula para el modelo simplificado:
+$$
+H_0: \beta_{altura} = 0
+$$
+
+Si hacemos el contraste con el nuevo modelo general:
+```{r}
+mod_completo2 <- lm(liver_weight ~ gender + weight + height, data = new_data)
+
+anova(mod_Chan, mod_completo2)
+```
+
+En esta ocasión vemos en el resultado del contraste que no tenemos razones para rechazar la hipótesis nula de que el valor de la variable altura no afecta a la predicción del peso calculado del hígado. Por tanto, podemos utilizar el modelo simplificado que sólo tiene en cuenta género y peso.
+
+#### Estimación del intervalo para la media con nuestro modelo completo
+
+Teniendo en cuenta una donante de 54kg, y que el resto de sus parámetros estén dentro de la media de nuestro set de datos:
+```{r}
+# Estimacion datos donante
+donante <- data.frame(t(colMeans(new_data[-1])))
+donante["gender"] <- as.factor("F")
+donante["weight"] <- 54
+
+(predi_completo <- predict(mod_multiple, donante, interval = "prediction"))
+```
+
+Nuestro modelo completo predice un peso calculado del hígado de `r round(predi_completo[[1]])` gramos, con un intervalo de confianza del 95% entre `r round(predi_completo[[2]])` gramos y `r round(predi_completo[[3]])` gramos.
+
+#### Estimación puntual con el modelo de Chan
+```{r}
+# Teniendo en cuenta una donante de 54kg
+(predi_chan <- predict(mod_Chan, donante))
+```
+
+La predicción puntual usando el modelo simplificado de Chan para una donante de 54 kg es un peso calculado de hígado de `r round(predi_chan[[1]])` gramos.
+
+
 <!-- # Apéndice A: Código -->
 
 <!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
