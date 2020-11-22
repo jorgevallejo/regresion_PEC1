@@ -795,15 +795,15 @@ El valor `Tukey.p` es el p-valor asociado al estimador de $\lambda$, que podemos
 
 
 
-<!-- # Apéndice A: Código -->
+# Apéndice A: Código
 
-<!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
-<!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
+El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github:
+[jorgevallejo/regresion_PEC1](https://github.com/jorgevallejo/regresion_PEC1)
 
-<!-- # Apéndice B: Reproducibilidad {#apendiceB} -->
-<!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
-<!-- sessionInfo() # For better reproducibility -->
-<!-- ``` -->
+# Apéndice B: Reproducibilidad {#apendiceB}
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+sessionInfo() # For better reproducibility
+```
 
 
 # Referencias

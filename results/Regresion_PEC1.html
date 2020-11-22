@@ -219,6 +219,8 @@ summary {
 <li><a href="#b.-contrastar-la-no-interacción.">3b. Contrastar la no interacción.</a></li>
 <li><a href="#c.-realizar-el-contraste-de-tukey-con-una-función-de-r">3c. Realizar el contraste de Tukey con una función de R</a></li>
 </ul></li>
+<li><a href="#apéndice-a-código">Apéndice A: Código</a></li>
+<li><a href="#apendiceB">Apéndice B: Reproducibilidad</a></li>
 <li><a href="#referencias">Referencias</a></li>
 </ul>
 </div>
@@ -1040,14 +1042,59 @@ tukey_1df_snake_adit_Error_aov</code></pre>
 ## $Devn.SS
 ## [1] 7269.757</code></pre>
 <p>El valor <code>Tukey.p</code> es el p-valor asociado al estimador de <span class="math inline">\(\lambda\)</span>, que podemos comprobar que es igual al que obtuvimos en el apartado 2b, igualmente no significativo y por el que concluimos que no debe de haber interacción entre los parámetros <code>Day</code> y <code>snake_ID</code>.</p>
-<!-- # Apéndice A: Código -->
-<!-- El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: -->
-<!-- [jorgevallejo/RNAseq_analysis_PEC2](https://github.com/jorgevallejo/RNAseq_analysis_PEC2) -->
-<!-- # Apéndice B: Reproducibilidad {#apendiceB} -->
-<!-- ```{r session_info, include=TRUE, echo=TRUE, results='markup'} -->
-<!-- sessionInfo() # For better reproducibility -->
-<!-- ``` -->
 </div>
+</div>
+<div id="apéndice-a-código" class="section level1">
+<h1>Apéndice A: Código</h1>
+<p>El documento original en formato .Rmd, que incluye el código completo en lenguaje R usado para generar este informe, se puede consultar y descargar en el siguiente repositorio de Github: <a href="https://github.com/jorgevallejo/regresion_PEC1">jorgevallejo/regresion_PEC1</a></p>
+</div>
+<div id="apendiceB" class="section level1">
+<h1>Apéndice B: Reproducibilidad</h1>
+<pre class="r"><code>sessionInfo() # For better reproducibility</code></pre>
+<pre><code>## R version 3.6.3 (2020-02-29)
+## Platform: i686-pc-linux-gnu (32-bit)
+## Running under: Ubuntu 16.04.7 LTS
+## 
+## Matrix products: default
+## BLAS:   /usr/lib/libblas/libblas.so.3.6.0
+## LAPACK: /usr/lib/lapack/liblapack.so.3.6.0
+## 
+## locale:
+##  [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+##  [3] LC_TIME=en_GB.UTF-8        LC_COLLATE=en_US.UTF-8    
+##  [5] LC_MONETARY=en_GB.UTF-8    LC_MESSAGES=en_US.UTF-8   
+##  [7] LC_PAPER=en_GB.UTF-8       LC_NAME=C                 
+##  [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+## [11] LC_MEASUREMENT=en_GB.UTF-8 LC_IDENTIFICATION=C       
+## 
+## attached base packages:
+## [1] stats     graphics  grDevices utils     datasets  methods   base     
+## 
+## other attached packages:
+## [1] dae_3.1-32      ggplot2_3.3.2   MASS_7.3-53     car_3.0-10     
+## [5] carData_3.0-4   faraway_1.0.7   tseries_0.10-47 knitr_1.25     
+## 
+## loaded via a namespace (and not attached):
+##  [1] generics_0.0.2    magrittr_1.5      nloptr_1.2.2.1   
+##  [4] gtable_0.3.0      rmarkdown_1.17    vctrs_0.3.4      
+##  [7] minqa_1.2.4       data.table_1.12.4 hms_0.5.3        
+## [10] pillar_1.4.6      htmltools_0.5.0   forcats_0.5.0    
+## [13] stringr_1.4.0     haven_2.3.1       curl_4.3         
+## [16] splines_3.6.3     cellranger_1.1.0  dplyr_1.0.0      
+## [19] TTR_0.24.2        lattice_0.20-41   tidyselect_1.1.0 
+## [22] plyr_1.8.4        zoo_1.8-8         rio_0.5.16       
+## [25] lifecycle_0.2.0   pkgconfig_2.0.3   Matrix_1.2-18    
+## [28] R6_2.4.0          digest_0.6.21     xfun_0.10        
+## [31] colorspace_1.4-1  stringi_1.4.3     yaml_2.2.0       
+## [34] boot_1.3-25       evaluate_0.14     tibble_3.0.4     
+## [37] abind_1.4-5       compiler_3.6.3    withr_2.1.2      
+## [40] munsell_0.5.0     Rcpp_1.0.5        readxl_1.3.1     
+## [43] highr_0.8         ellipsis_0.3.0    tools_3.6.3      
+## [46] foreign_0.8-76    lme4_1.1-21       quantmod_0.4.17  
+## [49] zip_2.1.1         xts_0.12.1        scales_1.1.1     
+## [52] crayon_1.3.4      quadprog_1.5-8    glue_1.4.1       
+## [55] purrr_0.3.4       openxlsx_4.2.3    rlang_0.4.8      
+## [58] nlme_3.1-149      grid_3.6.3</code></pre>
 </div>
 <div id="referencias" class="section level1 unnumbered">
 <h1>Referencias</h1>
