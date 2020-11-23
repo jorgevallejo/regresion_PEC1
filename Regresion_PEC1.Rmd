@@ -700,6 +700,36 @@ coef(mod_snakes)
 Observamos que la función `lm()` ha eliminado los parámetros _Day1_ y _D2_ para generar una matriz de diseño de rango máximo y solución definida. Vemos también que los valores de los coeficientes aquí calculados no se parecen a los que hemos calculado mediante g-inversa.
 
 
+## 2d. Restricciones
+
+```{r}
+options(contrasts=c('contr.sum','contr.poly'))
+```
+
+Si recalculamos la estimación del modelo `lm()`:
+```{r}
+mod_snakes_rest <- lm(Trials ~ snake_ID + Day, data = snakes_long)
+summary(mod_snakes_rest)
+```
+
+El cálculo de los parámetros no coincide con ninguna de las soluciones anteriores.
+
+### Estimaciones de $\alpha_6$ y $\beta_4$
+
+No están calculadas directamente en la regresión, pero como estamos trabajando con la restricción de que todas las alfas suman cero, y de que todas las betas suman cero, podemos calcular las estimaciones.
+
+```{r}
+a_6 <- 0 - sum(coef(mod_snakes_rest)[2:6])
+b_4 <- 0 - sum(coef(mod_snakes_rest)[7:9])
+```
+
+$\alpha_6$ = `r round(a_6, 2)`  
+$\beta_4$ = `r round(b_4, 2)`
+
+```{r}
+# Change options back
+options(contrasts=c('contr.treatment','contr.poly'))
+```
 
 
 

@@ -213,6 +213,9 @@ summary {
 <li><a href="#cantidad-de-g-inversas-y-de-soluciones-a-las-ecuaciones-normales-de-este-modelo">Cantidad de g-inversas y de soluciones a las ecuaciones normales de este modelo</a></li>
 <li><a href="#solución-con-la-función-lm-de-r">Solución con la función lm() de R</a></li>
 </ul></li>
+<li><a href="#d.-restricciones">2d. Restricciones</a><ul>
+<li><a href="#estimaciones-de-alpha_6-y-beta_4">Estimaciones de <span class="math inline">\(\alpha_6\)</span> y <span class="math inline">\(\beta_4\)</span></a></li>
+</ul></li>
 </ul></li>
 <li><a href="#ejercicio-3.-prueba-de-aditividad-de-tukey">Ejercicio 3. Prueba de aditividad de Tukey</a><ul>
 <li><a href="#a.-estimar-los-parámetros-del-modelo-sin-interacción">3a. Estimar los parámetros del modelo sin interacción</a></li>
@@ -919,6 +922,49 @@ A &lt;- design_matrix
 ##    DayDay_2    DayDay_3    DayDay_4 
 ##   -16.33333   -28.83333   -38.00000</code></pre>
 <p>Observamos que la función <code>lm()</code> ha eliminado los parámetros <em>Day1</em> y <em>D2</em> para generar una matriz de diseño de rango máximo y solución definida. Vemos también que los valores de los coeficientes aquí calculados no se parecen a los que hemos calculado mediante g-inversa.</p>
+</div>
+</div>
+<div id="d.-restricciones" class="section level2">
+<h2>2d. Restricciones</h2>
+<pre class="r"><code>options(contrasts=c('contr.sum','contr.poly'))</code></pre>
+<p>Si recalculamos la estimación del modelo <code>lm()</code>:</p>
+<pre class="r"><code>mod_snakes_rest &lt;- lm(Trials ~ snake_ID + Day, data = snakes_long)
+summary(mod_snakes_rest)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Trials ~ snake_ID + Day, data = snakes_long)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -35.542 -11.646  -0.458   9.958  36.208 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   42.542      4.517   9.418 1.09e-07 ***
+## snake_ID1     11.208     10.101   1.110   0.2846    
+## snake_ID2      7.458     10.101   0.738   0.4717    
+## snake_ID3     13.708     10.101   1.357   0.1948    
+## snake_ID4     -5.792     10.101  -0.573   0.5749    
+## snake_ID5    -11.792     10.101  -1.167   0.2613    
+## Day1          20.792      7.824   2.657   0.0179 *  
+## Day2           4.458      7.824   0.570   0.5772    
+## Day3          -8.042      7.824  -1.028   0.3203    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 22.13 on 15 degrees of freedom
+## Multiple R-squared:  0.5188, Adjusted R-squared:  0.2622 
+## F-statistic: 2.022 on 8 and 15 DF,  p-value: 0.1142</code></pre>
+<p>El cálculo de los parámetros no coincide con ninguna de las soluciones anteriores.</p>
+<div id="estimaciones-de-alpha_6-y-beta_4" class="section level3">
+<h3>Estimaciones de <span class="math inline">\(\alpha_6\)</span> y <span class="math inline">\(\beta_4\)</span></h3>
+<p>No están calculadas directamente en la regresión, pero como estamos trabajando con la restricción de que todas las alfas suman cero, y de que todas las betas suman cero, podemos calcular las estimaciones.</p>
+<pre class="r"><code>a_6 &lt;- 0 - sum(coef(mod_snakes_rest)[2:6])
+b_4 &lt;- 0 - sum(coef(mod_snakes_rest)[7:9])</code></pre>
+<p><span class="math inline">\(\alpha_6\)</span> = -14.79<br />
+<span class="math inline">\(\beta_4\)</span> = -17.21</p>
+<pre class="r"><code># Change options back
+options(contrasts=c('contr.treatment','contr.poly'))</code></pre>
 </div>
 </div>
 </div>
